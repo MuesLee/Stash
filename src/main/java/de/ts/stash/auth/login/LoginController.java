@@ -1,4 +1,4 @@
-package de.ts.stash;
+package de.ts.stash.auth.login;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
