@@ -19,6 +19,12 @@ public class JwtProvider implements AuthTokenProvider {
 
 	@Override
 	public String provideAuthToken(ApplicationUser user) {
+		if(user == null || user.getUsername() == null)
+		{
+			throw new IllegalArgumentException("User is missing a name!");
+		}
+		
+		
 		log.debug("Creating Token for: " + user.getUsername());
 		String token = JWT.create().withSubject(user.getUsername())
 				.withExpiresAt(new Date(System.currentTimeMillis() + EXPIRATION_TIME)).sign(HMAC512(SECRET.getBytes()));
