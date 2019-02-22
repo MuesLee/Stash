@@ -41,7 +41,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
 	@Bean
 	AuthTokenProvider authTokenProvider() {
-		return new JwtProvider();
+		return new JwtAuthTokenProvider();
 	}
 
 	@Bean

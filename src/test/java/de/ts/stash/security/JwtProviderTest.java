@@ -1,19 +1,22 @@
 package de.ts.stash.security;
 
+import java.util.Collections;
+
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
 import de.ts.stash.auth.user.ApplicationUser;
+import de.ts.stash.auth.user.Role;
 
 public class JwtProviderTest {
 
-	private JwtProvider classUnderTest = new JwtProvider();
+	private JwtAuthTokenProvider classUnderTest = new JwtAuthTokenProvider();
 
 	@Test
 	public void shouldCreateTokenForUser() throws Exception {
 
-		ApplicationUser user = new ApplicationUser(0, "Test", "123");
+		ApplicationUser user = new ApplicationUser( "Test", "bla", Collections.singletonList(Role.USER));
 
 		String provideAuthToken = classUnderTest.provideAuthToken(user);
 
@@ -23,7 +26,7 @@ public class JwtProviderTest {
 	@Test(expected=IllegalArgumentException.class)
 	public void shouldThrowIllegalArgumentForMissingUserName() throws Exception {
 
-		ApplicationUser user = new ApplicationUser(0, null, "123");
+		ApplicationUser user = new ApplicationUser(null, "123", Collections.singletonList(Role.USER));
 		classUnderTest.provideAuthToken(user);
 	}
 

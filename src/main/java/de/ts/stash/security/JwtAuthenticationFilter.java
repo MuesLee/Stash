@@ -22,12 +22,16 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.ts.stash.auth.user.ApplicationUser;
+import de.ts.stash.auth.user.UserRepository;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private final AuthenticationManager authenticationManager;
 
 	@Autowired
 	AuthTokenProvider authTokenProvider;
+	
+	private UserRepository userRepository;
+	
 
 	public JwtAuthenticationFilter(final AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
@@ -50,9 +54,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 	protected void successfulAuthentication(final HttpServletRequest req, final HttpServletResponse res, final FilterChain chain,
 			final Authentication auth) throws IOException, ServletException {
 
-		final String username = ((User) auth.getPrincipal()).getUsername();
-		final ApplicationUser user = new ApplicationUser(0L, username, null);
-		final String token = authTokenProvider.provideAuthToken(user);
+		final User principal = (User) auth.getPrincipal();
+		final String username = principal.getUsername();
+		final ApplicationUser findByUsername = userRepository.findByUsername(username);
+		final String token = authTokenProvider.provideAuthToken(findByUsername);
 
 		res.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 	}

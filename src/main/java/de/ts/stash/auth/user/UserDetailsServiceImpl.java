@@ -1,8 +1,5 @@
 package de.ts.stash.auth.user;
 
-import static java.util.Collections.emptyList;
-
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,18 +7,18 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    public UserDetailsServiceImpl(UserRepository applicationUserRepository) {
+    public UserDetailsServiceImpl(final UserRepository applicationUserRepository) {
         this.userRepository = applicationUserRepository;
     }
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ApplicationUser applicationUser = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(final String username) throws UsernameNotFoundException {
+        final ApplicationUser applicationUser = userRepository.findByUsername(username);
         if (applicationUser == null) {
             throw new UsernameNotFoundException(username);
         }
-        return new User(applicationUser.getUsername(), applicationUser.getPassword(), emptyList());
+		return applicationUser;
     }
 }
