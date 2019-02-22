@@ -43,6 +43,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	AuthTokenProvider authTokenProvider() {
 		return new JwtAuthTokenProvider();
 	}
+	@Bean
+	AuthTokenReader authTokenReader() {
+		return new JwtAuthTokenReader();
+	}
 
 	@Bean
 	CorsConfigurationSource corsConfigurationSource() {
