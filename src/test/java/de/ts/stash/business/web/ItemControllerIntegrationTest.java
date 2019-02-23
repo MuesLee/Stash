@@ -3,6 +3,8 @@ package de.ts.stash.business.web;
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
+import java.util.List;
+
 import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,6 +20,11 @@ import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.ts.stash.domain.Item;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration
@@ -47,9 +54,10 @@ public class ItemControllerIntegrationTest {
 		int status = response.getStatus();
 		String contentAsString = response.getContentAsString();
 		
+		List<Item> actualItems = new ObjectMapper().readValue(contentAsString, new TypeReference<List<Item>>(){});
 		
 		Assert.assertThat("Status is 200", status, Matchers.equalTo(200));
-		Assert.assertThat("Items must not be emtpy", contentAsString, Matchers.notNullValue());
+		Assert.assertThat("Items has size 2", actualItems, Matchers.hasSize(2));
 	}
 	
 }
