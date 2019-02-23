@@ -16,7 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
-import de.ts.stash.auth.user.ApplicationUser;
+import de.ts.stash.domain.ApplicationUser;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 

@@ -1,4 +1,4 @@
-package de.ts.stash.auth.user;
+package de.ts.stash.domain;
 
 import java.util.Collection;
 import java.util.List;

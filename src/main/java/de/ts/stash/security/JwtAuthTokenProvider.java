@@ -12,7 +12,7 @@ import com.auth0.jwt.JWT;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.ts.stash.auth.user.ApplicationUser;
+import de.ts.stash.domain.ApplicationUser;
 import lombok.extern.slf4j.Slf4j;
 
 @Component

@@ -21,8 +21,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import de.ts.stash.auth.user.ApplicationUser;
-import de.ts.stash.auth.user.UserRepository;
+import de.ts.stash.domain.ApplicationUser;
+import de.ts.stash.persistence.UserRepository;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	private final AuthenticationManager authenticationManager;

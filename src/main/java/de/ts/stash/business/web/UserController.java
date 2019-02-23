@@ -18,9 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import de.ts.stash.auth.user.ApplicationUser;
-import de.ts.stash.auth.user.Role;
-import de.ts.stash.auth.user.UserRepository;
+import de.ts.stash.domain.ApplicationUser;
+import de.ts.stash.domain.Role;
+import de.ts.stash.persistence.UserRepository;
 import de.ts.stash.security.AuthTokenProvider;
 
 @RestController

@@ -2,7 +2,7 @@ package de.ts.stash.security;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 
-import de.ts.stash.auth.user.ApplicationUser;
+import de.ts.stash.domain.ApplicationUser;
 
 public interface AuthTokenProvider {
 

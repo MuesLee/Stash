@@ -6,8 +6,8 @@ import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import de.ts.stash.auth.user.ApplicationUser;
-import de.ts.stash.auth.user.Role;
+import de.ts.stash.domain.ApplicationUser;
+import de.ts.stash.domain.Role;
 
 public class JwtReaderTest {
 
