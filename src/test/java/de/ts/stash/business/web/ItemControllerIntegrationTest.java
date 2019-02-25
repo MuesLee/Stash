@@ -55,5 +55,4 @@ public class ItemControllerIntegrationTest {
 		Assert.assertThat("Status is 200", status, Matchers.equalTo(200));
 		Assert.assertThat("Items has size 2", actualItems, Matchers.hasSize(2));
 	}
-
 }
