@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -49,6 +50,20 @@ public class UserController {
 		final ApplicationUser newlyCreatedUser = userRepository
 				.save(new ApplicationUser(user.getUsername(), encodedPassword, roles));
 		final String token = authTokenProvider.provideAuthToken(newlyCreatedUser);
+		response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
+	}
+
+	@PostMapping("/login")
+	@ResponseStatus(HttpStatus.OK)
+	public void login(@RequestBody final RegisterUserData user, final HttpServletResponse response)
+			throws JsonProcessingException {
+		final ApplicationUser findByUsername = userRepository.findByUsername(user.getUsername());
+		if (findByUsername == null || !bCryptPasswordEncoder.matches(user.getPassword(), findByUsername.getPassword())) {
+			throw new UsernameNotFoundException(
+					"User " + user.getUsername() + " could not be found or a bad password has been provided");
+		}
+
+		final String token = authTokenProvider.provideAuthToken(findByUsername);
 		response.addHeader(HEADER_STRING, TOKEN_PREFIX + token);
 	}
 }

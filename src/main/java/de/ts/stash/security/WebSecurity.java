@@ -1,6 +1,7 @@
 package de.ts.stash.security;
 
 import static de.ts.stash.security.SecurityConstants.SIGN_UP_URL;
+import static de.ts.stash.security.SecurityConstants.LOGIN_URL;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,7 +33,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().anyRequest()
+				.and()
+				.authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().and()
+				.authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).permitAll()
+				.anyRequest()
 				.authenticated().and().addFilter(new JwtAuthorizationFilter(authenticationManager()))
 				.addFilter(new JwtAuthenticationFilter(authenticationManager()));
 	}

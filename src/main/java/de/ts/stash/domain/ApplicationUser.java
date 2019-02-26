@@ -10,6 +10,8 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import lombok.AllArgsConstructor;
@@ -55,6 +57,7 @@ public class ApplicationUser implements UserDetails {
 	private String password;
 	
 	@ElementCollection
+	@Fetch(FetchMode.JOIN)
 	@Column(nullable=false)
 	private Collection<Role> authorities;
 
