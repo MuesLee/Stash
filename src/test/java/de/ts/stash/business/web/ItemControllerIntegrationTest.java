@@ -2,6 +2,8 @@ package de.ts.stash.business.web;
 
 import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.List;
 
@@ -29,7 +31,6 @@ import de.ts.stash.domain.Item;
 @SpringBootTest
 @AutoConfigureMockMvc
 public class ItemControllerIntegrationTest {
-	
 
 	@Autowired
 	private WebApplicationContext context;
@@ -43,7 +44,7 @@ public class ItemControllerIntegrationTest {
 
 	@Test
 	@WithMockUser
-	public void testGetAllItems() throws Exception {
+	public void testGetAllItemsWithMockUser() throws Exception {
 
 		MockHttpServletResponse response = mvc.perform(get("/v1/Items")).andReturn().getResponse();
 		int status = response.getStatus();
@@ -54,5 +55,12 @@ public class ItemControllerIntegrationTest {
 
 		Assert.assertThat("Status is 200", status, Matchers.equalTo(200));
 		Assert.assertThat("Items has size 2", actualItems, Matchers.hasSize(2));
+	}
+
+	@Test
+	public void testGetAllItemsNotAuthenticatedShouldReturn403() throws Exception {
+
+		mvc.perform(get("/v1/Items")).andExpect(status().isForbidden())
+				.andExpect(content().string(Matchers.isEmptyOrNullString())).andReturn().getResponse();
 	}
 }
