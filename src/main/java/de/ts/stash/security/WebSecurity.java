@@ -1,7 +1,7 @@
 package de.ts.stash.security;
 
-import static de.ts.stash.security.SecurityConstants.SIGN_UP_URL;
 import static de.ts.stash.security.SecurityConstants.LOGIN_URL;
+import static de.ts.stash.security.SecurityConstants.SIGN_UP_URL;
 
 import java.util.Arrays;
 import java.util.Collections;

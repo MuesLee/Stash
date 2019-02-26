@@ -11,7 +11,6 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -25,18 +24,17 @@ import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.persistence.UserRepository;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
+
+	private final AuthTokenProvider authTokenProvider = new JwtAuthTokenProvider();
+	
 	private final AuthenticationManager authenticationManager;
-
-	@Autowired
-	AuthTokenProvider authTokenProvider;
 	
-	private UserRepository userRepository;
-	
-
-	public JwtAuthenticationFilter(final AuthenticationManager authenticationManager) {
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
 		this.authenticationManager = authenticationManager;
 	}
 
+	private UserRepository userRepository;
+	
 	@Override
 	public Authentication attemptAuthentication(final HttpServletRequest req, final HttpServletResponse res)
 			throws AuthenticationException {
