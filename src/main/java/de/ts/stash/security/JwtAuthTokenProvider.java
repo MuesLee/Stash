@@ -26,6 +26,7 @@ public class JwtAuthTokenProvider implements AuthTokenProvider {
 			throw new IllegalArgumentException("User is missing a name!");
 		}
 		
+		user.setPassword(null);
 		String userPayload = new ObjectMapper().writeValueAsString(user);
 		
 		log.debug("Creating Token for: " + user.getUsername());
