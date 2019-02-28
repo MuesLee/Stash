@@ -46,7 +46,7 @@ public class ItemControllerIntegrationTest {
 	@WithMockUser
 	public void testGetAllItemsWithMockUser() throws Exception {
 
-		MockHttpServletResponse response = mvc.perform(get("/v1/Items")).andReturn().getResponse();
+		MockHttpServletResponse response = mvc.perform(get("/v1/items")).andReturn().getResponse();
 		int status = response.getStatus();
 		String contentAsString = response.getContentAsString();
 
@@ -60,7 +60,7 @@ public class ItemControllerIntegrationTest {
 	@Test
 	public void testGetAllItemsNotAuthenticatedShouldReturn403() throws Exception {
 
-		mvc.perform(get("/v1/Items")).andExpect(status().isForbidden())
+		mvc.perform(get("/v1/items")).andExpect(status().isForbidden())
 				.andExpect(content().string(Matchers.isEmptyOrNullString())).andReturn().getResponse();
 	}
 }

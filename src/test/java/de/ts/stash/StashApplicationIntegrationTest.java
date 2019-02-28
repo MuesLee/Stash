@@ -55,13 +55,13 @@ public class StashApplicationIntegrationTest {
 		final byte[] registerUserData = new RegisterUserData("Bob", "x").asJson();
 		ResultActions result = mockMvc
 				.perform(post("/users/sign-up").contentType(MediaType.APPLICATION_JSON_UTF8).content(registerUserData))
-				.andExpect(status().isCreated()).andExpect(header().string(SecurityConstants.HEADER_STRING,
-						Matchers.startsWith(SecurityConstants.TOKEN_PREFIX)));
+				.andExpect(status().isCreated()).andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
+						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)));
 
-		String autherizationHeader = result.andReturn().getResponse().getHeader(SecurityConstants.HEADER_STRING);
+		String autherizationHeader = result.andReturn().getResponse().getHeader(SecurityConstants.AUTH_HEADER_STRING);
 
 		MockHttpServletResponse response = mockMvc
-				.perform(get("/v1/Items").header(SecurityConstants.HEADER_STRING, autherizationHeader))
+				.perform(get("/v1/items").header(SecurityConstants.AUTH_HEADER_STRING, autherizationHeader))
 				.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON_UTF8))
 				.andReturn().getResponse();
 		String contentAsString = response.getContentAsString();

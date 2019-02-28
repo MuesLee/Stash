@@ -24,7 +24,7 @@ import de.ts.stash.exception.ItemNotFoundException;
 import de.ts.stash.persistence.ItemRepository;
 
 @RestController
-@RequestMapping("/v1/Items")
+@RequestMapping("/v1/items")
 public class ItemController {
     private ItemRepository items;
     public ItemController(ItemRepository Items) {
@@ -41,7 +41,7 @@ public class ItemController {
         return created(
             ServletUriComponentsBuilder
                 .fromContextPath(request)
-                .path("/v1/Items/{id}")
+                .path("/v1/items/{id}")
                 .buildAndExpand(saved.getId())
                 .toUri())
             .build();
