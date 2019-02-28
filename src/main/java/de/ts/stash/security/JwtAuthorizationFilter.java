@@ -1,7 +1,7 @@
 package de.ts.stash.security;
 
-import static de.ts.stash.security.SecurityConstants.HEADER_STRING;
-import static de.ts.stash.security.SecurityConstants.TOKEN_PREFIX;
+import static de.ts.stash.security.SecurityConstants.AUTH_HEADER_STRING;
+import static de.ts.stash.security.SecurityConstants.ACCESS_TOKEN_PREFIX;
 
 import java.io.IOException;
 
@@ -29,14 +29,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 	@Override
 	protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain)
 			throws IOException, ServletException {
-		String header = req.getHeader(HEADER_STRING);
+		String header = req.getHeader(AUTH_HEADER_STRING);
 
-		if (header == null || !header.startsWith(TOKEN_PREFIX)) {
+		if (header == null || !header.startsWith(ACCESS_TOKEN_PREFIX)) {
 			chain.doFilter(req, res);
 			return;
 		}
 
-		UsernamePasswordAuthenticationToken authentication = getAuthentication(header.replace(TOKEN_PREFIX, ""));
+		UsernamePasswordAuthenticationToken authentication = getAuthentication(header.replace(ACCESS_TOKEN_PREFIX, ""));
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		chain.doFilter(req, res);

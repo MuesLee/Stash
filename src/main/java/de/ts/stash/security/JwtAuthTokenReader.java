@@ -1,7 +1,7 @@
 package de.ts.stash.security;
 
 import static de.ts.stash.security.SecurityConstants.SECRET;
-import static de.ts.stash.security.SecurityConstants.TOKEN_PREFIX;
+import static de.ts.stash.security.SecurityConstants.ACCESS_TOKEN_PREFIX;
 
 import java.io.IOException;
 
@@ -21,7 +21,7 @@ public class JwtAuthTokenReader implements AuthTokenReader {
 			return null;
 		}
 		
-		String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build().verify(token.replace(TOKEN_PREFIX, ""))
+		String user = JWT.require(Algorithm.HMAC512(SECRET.getBytes())).build().verify(token.replace(ACCESS_TOKEN_PREFIX, ""))
 				.getSubject();
 		
 		return new ObjectMapper().readValue(user, ApplicationUser.class);
