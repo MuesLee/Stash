@@ -1,4 +1,4 @@
-package de.ts.stash.security;
+package de.ts.stash.security.api;
 
 import java.io.IOException;
 

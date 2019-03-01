@@ -19,6 +19,8 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import de.ts.stash.auth.user.UserDetailsServiceImpl;
+import de.ts.stash.security.api.AuthTokenProvider;
+import de.ts.stash.security.api.AuthTokenReader;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
@@ -34,7 +36,8 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	protected void configure(HttpSecurity http) throws Exception {
 		http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
 				.and().authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().and()
-				.authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).permitAll().anyRequest().authenticated()
+				.authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).permitAll().and()
+				.authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.REFRESH_URL).permitAll().anyRequest().authenticated()
 				.and().addFilter(new JwtAuthorizationFilter(authenticationManager()));
 	}
 

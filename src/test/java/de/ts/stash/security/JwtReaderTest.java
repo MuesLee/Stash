@@ -4,16 +4,34 @@ import java.util.Collections;
 
 import org.hamcrest.Matchers;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.domain.Role;
+import de.ts.stash.util.TimeProvider;
 
 public class JwtReaderTest {
 
+	@InjectMocks
 	private JwtAuthTokenReader classUnderTest = new JwtAuthTokenReader();
 	private JwtAuthTokenProvider authTokenProvider = new JwtAuthTokenProvider();
 
+	@Before
+	public void initMocks() {
+		MockitoAnnotations.initMocks(this);
+		Mockito.when(timeProvider.currentDateTime()).thenCallRealMethod();
+	}
+
+	@Mock
+	TimeProvider timeProvider;
+
+
+	
 	@Test
 	public void shouldReadTokenForUser() throws Exception {
 

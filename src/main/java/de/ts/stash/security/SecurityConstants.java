@@ -2,8 +2,8 @@ package de.ts.stash.security;
 
 public class SecurityConstants {
 	public static final String SECRET = "akjDNAsdnasd,masdnNLNSDna,smdas 123123 kadasdä#aöd,öa";
-	public static final long EXPIRATION_TIME = 864_000_000; // 10 days
-	public static final long REFRESH_TOKEN_EXPIRATION_TIME = 864_000_000; // 10 days
+	public static final long ACCESS_TOKEN_EXPIRATION_IN_MINUTES = 10;
+	public static final long REFRESH_TOKEN_EXPIRATION_IN_DAYS = 10;
 	public static final String ACCESS_TOKEN_PREFIX = "Bearer ";
 	public static final String AUTH_HEADER_STRING = "Authorization";
 	public static final String REFRESH_HEADER_STRING = "Refreshtoken";

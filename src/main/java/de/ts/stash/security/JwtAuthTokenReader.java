@@ -12,6 +12,7 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.ts.stash.domain.ApplicationUser;
+import de.ts.stash.security.api.AuthTokenReader;
 
 @Component
 public class JwtAuthTokenReader implements AuthTokenReader {

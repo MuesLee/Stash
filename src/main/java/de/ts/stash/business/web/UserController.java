@@ -2,6 +2,7 @@ package de.ts.stash.business.web;
 
 import static de.ts.stash.security.SecurityConstants.ACCESS_TOKEN_PREFIX;
 import static de.ts.stash.security.SecurityConstants.AUTH_HEADER_STRING;
+import static de.ts.stash.security.SecurityConstants.REFRESH_HEADER_STRING;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -27,9 +28,9 @@ import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.domain.Role;
 import de.ts.stash.persistence.RefreshTokenRepository;
 import de.ts.stash.persistence.UserRepository;
-import de.ts.stash.security.AuthTokenProvider;
-import de.ts.stash.security.RefreshTokenProvider;
 import de.ts.stash.security.SecurityConstants;
+import de.ts.stash.security.api.AuthTokenProvider;
+import de.ts.stash.security.api.RefreshTokenProvider;
 
 @RestController
 @RequestMapping("/users")
@@ -94,13 +95,16 @@ public class UserController {
 			throw new RefreshFailedException("Invalid token!");
 		}
 		
-		if(LocalDateTime.now().minusDays(SecurityConstants.REFRESH_TOKEN_EXPIRATION_TIME).isAfter(findByValue.getIssuedAt())) {
+		if(LocalDateTime.now().minusDays(SecurityConstants.REFRESH_TOKEN_EXPIRATION_IN_DAYS).isAfter(findByValue.getIssuedAt())) {
 			throw new RefreshFailedException("Token expired!");
 		}
 
 		ApplicationUser user = findByValue.getUser();
 
-		final String token = authTokenProvider.provideAuthToken(user);
-		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
+		final String newAccesstoken = authTokenProvider.provideAuthToken(user);
+		final RefreshToken newRefreshToken = refreshTokenProvider.provideToken(user);
+		
+		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + newAccesstoken);
+		response.addHeader(REFRESH_HEADER_STRING, newRefreshToken.getValue());
 	}
 }

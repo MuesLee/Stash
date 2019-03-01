@@ -1,34 +1,45 @@
 package de.ts.stash.business.web;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import java.time.LocalDateTime;
+import java.util.Date;
+
 import org.hamcrest.Matchers;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
-
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.web.FilterChainProxy;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 
+import com.auth0.jwt.JWT;
+
 import de.ts.stash.security.SecurityConstants;
+import de.ts.stash.util.TimeProvider;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class UserControllerIntegrationTest {
+
+	@MockBean
+	private TimeProvider timeProvider;
 
 	@Autowired
 	private WebApplicationContext wac;
@@ -41,6 +52,7 @@ public class UserControllerIntegrationTest {
 	@Before
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilter(springSecurityFilterChain).build();
+		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
 	}
 
 	@Test
@@ -73,20 +85,53 @@ public class UserControllerIntegrationTest {
 				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
 						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)));
 	}
+
 	@Test
 	public void userCanRefreshAcessTokenWithRefreshToken() throws Exception {
+		Mockito.when(timeProvider.currentDateTime())
+				.thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE).minusMinutes(8l));
+
 		final byte[] registerUserData = new RegisterUserData("Lacy", "x").asJson();
-		final ResultActions result = mockMvc.perform(post("/users/sign-up").contentType(MediaType.APPLICATION_JSON).content(registerUserData))
-		.andExpect(status().isCreated()).andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
-				Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)));
-		
-		final String refreshToken = result.andReturn().getResponse().getHeader(SecurityConstants.REFRESH_HEADER_STRING);
-		Assert.assertThat("Refreshtoken must not be null", refreshToken, Matchers.notNullValue());
-		
-		mockMvc.perform(post("/users/refresh").contentType(MediaType.APPLICATION_JSON).header(SecurityConstants.REFRESH_HEADER_STRING, refreshToken ))
-		.andExpect(status().is(HttpStatus.OK.value()))
-		.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
-				Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
-		.andExpect(header().string(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()));
+		final ResultActions loginResult = mockMvc
+				.perform(post("/users/sign-up").contentType(MediaType.APPLICATION_JSON).content(registerUserData))
+				.andExpect(status().isCreated())
+				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
+						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
+				.andExpect(header().string(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()));
+
+		MockHttpServletResponse response = loginResult.andReturn().getResponse();
+
+		final String initialRefreshToken = response.getHeader(SecurityConstants.REFRESH_HEADER_STRING);
+		final String initialAccessToken = response.getHeader(SecurityConstants.AUTH_HEADER_STRING)
+				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
+
+		Assert.assertThat("Refreshtoken must not be null", initialRefreshToken, Matchers.notNullValue());
+		Assert.assertThat("Accesstoken must not be null", initialAccessToken, Matchers.notNullValue());
+
+		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
+
+		MvcResult refreshResult = mockMvc
+				.perform(post("/users/refresh").contentType(MediaType.APPLICATION_JSON)
+						.content("{ \"value\": \"" + initialRefreshToken + "\" }"))
+				.andExpect(status().is(HttpStatus.OK.value()))
+				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
+						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
+				.andExpect(header().string(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()))
+				.andReturn();
+
+		final String refreshedRefreshToken = refreshResult.getResponse()
+				.getHeader(SecurityConstants.REFRESH_HEADER_STRING);
+		final String refreshedAccessToken = refreshResult.getResponse().getHeader(SecurityConstants.AUTH_HEADER_STRING)
+				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
+
+		Assert.assertThat("Should return new refreshtoken", initialRefreshToken, Matchers.not(refreshedRefreshToken));
+		Assert.assertThat("Should return new accesstoken", initialAccessToken, Matchers.not(refreshedAccessToken));
+
+		Date initialExpiresAt = JWT.decode(initialAccessToken).getExpiresAt();
+		Date refreshedExpiresAt = JWT.decode(refreshedAccessToken).getExpiresAt();
+
+		Assert.assertThat("Refreshed accesstoken should expire after initial accesstoken",
+				initialExpiresAt.before(refreshedExpiresAt), Matchers.is(true));
+
 	}
 }

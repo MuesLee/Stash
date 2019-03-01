@@ -16,6 +16,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 import de.ts.stash.domain.ApplicationUser;
+import de.ts.stash.security.api.AuthTokenReader;
 
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 

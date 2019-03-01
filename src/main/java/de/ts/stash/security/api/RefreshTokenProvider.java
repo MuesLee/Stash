@@ -1,4 +1,4 @@
-package de.ts.stash.security;
+package de.ts.stash.security.api;
 
 import de.ts.stash.auth.user.RefreshToken;
 import de.ts.stash.domain.ApplicationUser;

@@ -5,6 +5,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import de.ts.stash.util.TimeProvider;
+
 @SpringBootApplication
 public class StashApplication {
 
@@ -15,6 +17,12 @@ public class StashApplication {
 	@Bean
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
+	}
+	
+	@Bean
+	public TimeProvider timeProvider()
+	{
+		return new TimeProvider();
 	}
 
 }
