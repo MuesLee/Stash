@@ -62,8 +62,11 @@ public class ItemController {
 	@PutMapping("/{id}")
 	@ResponseBody
 	public void update(@PathVariable("id") final Long id, @RequestBody final Item form) {
+		if (!form.isValid()) {
+			throw new IllegalArgumentException("Invalid item");
+		}
 		final Item existed = this.items.findById(id).orElseThrow(() -> new ItemNotFoundException());
-		existed.setName(form.getName());
+		existed.update(form);
 		this.items.save(existed);
 	}
 }

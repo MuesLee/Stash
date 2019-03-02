@@ -40,4 +40,22 @@ public class Item {
 	@Enumerated(EnumType.STRING)
 	private Unit unit;
 
+	public void update(Item item) {
+		this.amount = item.amount;
+		this.name = item.name;
+	}
+
+	public boolean isValid() {
+		if (this.id == null)
+			return false;
+		if (this.amount == null)
+			return false;
+		if (this.unit == null)
+			return false;
+		if (this.name == null || this.name.equals(""))
+			return false;
+
+		return true;
+	}
+
 }
