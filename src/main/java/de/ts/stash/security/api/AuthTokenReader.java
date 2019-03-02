@@ -6,6 +6,6 @@ import de.ts.stash.domain.ApplicationUser;
 
 public interface AuthTokenReader {
 
-	public ApplicationUser extractUser(String token) throws IOException;
-	
+	ApplicationUser extractUser(String token) throws IOException;
+
 }

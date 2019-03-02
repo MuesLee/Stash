@@ -26,19 +26,24 @@ public class JwtAuthTokenProvider implements AuthTokenProvider {
 	TimeProvider timeProvider;
 
 	@Override
-	public String provideAuthToken(ApplicationUser user) throws JsonProcessingException {
+	public String provideAuthToken(final ApplicationUser user) throws JsonProcessingException {
 		if (user == null || user.getUsername() == null) {
 			throw new IllegalArgumentException("User is missing a name!");
 		}
 
 		user.setPassword(null);
-		String userPayload = new ObjectMapper().writeValueAsString(user);
+		final String userPayload = new ObjectMapper().writeValueAsString(user);
 
 		log.debug("Creating Token for: " + user.getUsername());
 
-		LocalDateTime expirationDate = timeProvider.currentDateTime().plusMinutes(ACCESS_TOKEN_EXPIRATION_IN_MINUTES);
+		final LocalDateTime expirationDate = this.timeProvider
+				.currentDateTime()
+				.plusMinutes(ACCESS_TOKEN_EXPIRATION_IN_MINUTES);
 
-		String token = JWT.create().withSubject(userPayload).withExpiresAt(timeProvider.convert(expirationDate))
+		final String token = JWT
+				.create()
+				.withSubject(userPayload)
+				.withExpiresAt(this.timeProvider.convert(expirationDate))
 				.sign(HMAC512(SECRET.getBytes()));
 
 		return token;

@@ -7,8 +7,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -46,21 +46,27 @@ public class ItemControllerIntegrationTest {
 	@WithMockUser
 	public void testGetAllItemsWithMockUser() throws Exception {
 
-		MockHttpServletResponse response = mvc.perform(get("/v1/items")).andReturn().getResponse();
-		int status = response.getStatus();
+		MockHttpServletResponse response = mvc
+				.perform(get("/v1/items"))
+				.andExpect(status().is(200))
+				.andReturn()
+				.getResponse();
 		String contentAsString = response.getContentAsString();
 
 		List<Item> actualItems = new ObjectMapper().readValue(contentAsString, new TypeReference<List<Item>>() {
 		});
 
-		Assert.assertThat("Status is 200", status, Matchers.equalTo(200));
-		Assert.assertThat("Items has size 2", actualItems, Matchers.hasSize(2));
+		assertThat(actualItems).hasSize(2);
 	}
 
 	@Test
 	public void testGetAllItemsNotAuthenticatedShouldReturn403() throws Exception {
 
-		mvc.perform(get("/v1/items")).andExpect(status().isForbidden())
-				.andExpect(content().string(Matchers.isEmptyOrNullString())).andReturn().getResponse();
+		mvc
+				.perform(get("/v1/items"))
+				.andExpect(status().isForbidden())
+				.andExpect(content().string(Matchers.isEmptyOrNullString()))
+				.andReturn()
+				.getResponse();
 	}
 }

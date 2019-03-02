@@ -27,19 +27,6 @@ import lombok.Setter;
 @Entity
 @Builder
 public class ApplicationUser implements UserDetails {
-	
-	public ApplicationUser(String username, String password, List<Role> authorities) {
-		this.id = 0l;
-		this.username = username;
-		this.password = password;
-		this.authorities = authorities;
-		this.accountNonExpired = true;
-		this.accountNonLocked = true;
-		this.enabled = true;
-		this.credentialsNonExpired = true;
-	}
-	
-	
 
 	/**
 	 * 
@@ -49,27 +36,38 @@ public class ApplicationUser implements UserDetails {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private long id;
-	
-	@Column(unique = true, nullable=false)
+
+	@Column(unique = true, nullable = false)
 	private String username;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private String password;
-	
+
 	@ElementCollection
 	@Fetch(FetchMode.JOIN)
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Collection<Role> authorities;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean accountNonExpired;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean accountNonLocked;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private boolean credentialsNonExpired;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean enabled;
+
+	public ApplicationUser(final String username, final String password, final List<Role> authorities) {
+		this.id = 0l;
+		this.username = username;
+		this.password = password;
+		this.authorities = authorities;
+		this.accountNonExpired = true;
+		this.accountNonLocked = true;
+		this.enabled = true;
+		this.credentialsNonExpired = true;
+	}
 }

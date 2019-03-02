@@ -28,17 +28,16 @@ public class Item {
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	@Column(nullable= false)
+
+	@Column(nullable = false)
 	private String name;
-	
-	@Column(nullable= false, precision=8, scale=2)
-	@Digits(integer=9, fraction=2)                    
+
+	@Column(nullable = false, precision = 8, scale = 2)
+	@Digits(integer = 9, fraction = 2)
 	private BigDecimal amount;
-	
-	@Column(nullable= false)
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Unit unit;
-	
-	
+
 }

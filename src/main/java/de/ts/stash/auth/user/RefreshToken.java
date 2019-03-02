@@ -24,20 +24,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class RefreshToken {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Long id;
-	
-	@Column(nullable= false, length=500)
+
+	@Column(nullable = false, length = 500)
 	private String value;
-	
-	@Column(nullable= false)
+
+	@Column(nullable = false)
 	private LocalDateTime issuedAt;
-	
+
 	@OneToOne
 	@JoinColumn(name = "userId")
 	private ApplicationUser user;
-	
-	
+
 }

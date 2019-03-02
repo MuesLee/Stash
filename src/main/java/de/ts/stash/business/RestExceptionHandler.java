@@ -14,14 +14,15 @@ import lombok.extern.slf4j.Slf4j;
 @RestControllerAdvice
 @Slf4j
 public class RestExceptionHandler {
-    @ExceptionHandler(value = {ItemNotFoundException.class})
-    public ResponseEntity<Void> vehicleNotFound(ItemNotFoundException ex, WebRequest request) {
-        log.debug("handling ItemNotFoundException...");
-        return notFound().build();
-    }
-    @ExceptionHandler(value = {UsernameNotFoundException.class})
-    public ResponseEntity<Void> usernameNotFound(UsernameNotFoundException ex, WebRequest request) {
-    	log.debug("handling UsernameNotFoundException...");
-    	return notFound().build();
-    }
+	@ExceptionHandler(value = { UsernameNotFoundException.class })
+	public ResponseEntity<Void> usernameNotFound(final UsernameNotFoundException ex, final WebRequest request) {
+		log.debug("handling UsernameNotFoundException...");
+		return notFound().build();
+	}
+
+	@ExceptionHandler(value = { ItemNotFoundException.class })
+	public ResponseEntity<Void> vehicleNotFound(final ItemNotFoundException ex, final WebRequest request) {
+		log.debug("handling ItemNotFoundException...");
+		return notFound().build();
+	}
 }

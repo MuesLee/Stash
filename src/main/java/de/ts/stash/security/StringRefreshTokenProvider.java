@@ -22,13 +22,13 @@ public class StringRefreshTokenProvider implements RefreshTokenProvider {
 
 	@Autowired
 	TimeProvider timeProvider;
-	
+
 	@Override
 	public RefreshToken provideToken(final ApplicationUser user) {
 		final String value = RandomStringUtils.randomAlphanumeric(500);
-		final LocalDateTime now = timeProvider.currentDateTime();
+		final LocalDateTime now = this.timeProvider.currentDateTime();
 		final RefreshToken token = RefreshToken.builder().issuedAt(now).user(user).value(value).build();
-		refreshTokenRepository.saveAndFlush(token);
+		this.refreshTokenRepository.saveAndFlush(token);
 		log.debug("Created token for user: " + user.getUsername());
 		return token;
 	}

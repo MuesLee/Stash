@@ -15,20 +15,20 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 @Slf4j
 public class DataInitializer implements CommandLineRunner {
-    @Autowired
-    ItemRepository itemRepo;
+	@Autowired
+	ItemRepository itemRepo;
 
-    @Override
-    public void run(String... args) throws Exception {
-        log.debug("initializing item data...");
-        
-        Item zucchini = Item.builder().amount(new BigDecimal(1)).name("Zucchini").unit(Unit.PIECE).build();
-        Item mehl = Item.builder().amount(new BigDecimal(1500)).name("Mehl").unit(Unit.GRAM).build();
-        
-        this.itemRepo.saveAll(Arrays.asList(zucchini, mehl));
-        this.itemRepo.flush();
-        
-        log.debug("printing all item...");
-        this.itemRepo.findAll().forEach(v -> log.debug(" Vehicle :" + v.toString()));
-    }
+	@Override
+	public void run(final String... args) throws Exception {
+		log.debug("initializing item data...");
+
+		final Item zucchini = Item.builder().amount(new BigDecimal(1)).name("Zucchini").unit(Unit.PIECE).build();
+		final Item mehl = Item.builder().amount(new BigDecimal(1500)).name("Mehl").unit(Unit.GRAM).build();
+
+		this.itemRepo.saveAll(Arrays.asList(zucchini, mehl));
+		this.itemRepo.flush();
+
+		log.debug("printing all item...");
+		this.itemRepo.findAll().forEach(v -> log.debug(" Vehicle :" + v.toString()));
+	}
 }
