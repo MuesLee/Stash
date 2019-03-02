@@ -52,6 +52,7 @@ public class UserControllerIntegrationTest {
 	@Before
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilter(springSecurityFilterChain).build();
+		Mockito.when(timeProvider.convert(Mockito.any(LocalDateTime.class))).thenCallRealMethod();
 		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
 	}
 
