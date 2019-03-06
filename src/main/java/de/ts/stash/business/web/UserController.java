@@ -52,8 +52,6 @@ public class UserController {
 		this.refreshTokenRepository = refreshTokenRepository;
 	}
 
-	@PostMapping("/sign-up")
-	@ResponseStatus(HttpStatus.CREATED)
 	public void signUp(@RequestBody final RegisterUserData user, final HttpServletResponse response)
 			throws JsonProcessingException {
 		final List<Role> roles = Arrays.asList(Role.USER);
@@ -70,8 +68,10 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	public void login(@RequestBody final RegisterUserData user, final HttpServletResponse response)
 			throws JsonProcessingException {
-		final Optional<ApplicationUser> findByUsername = userService.findByUsernameAndPassword(user.getUsername(), user.getPassword());
-		final ApplicationUser verifiedUser = findByUsername.orElseThrow( ()-> new UsernameNotFoundException("Invalid username / password"));
+		final Optional<ApplicationUser> findByUsername = userService.findByUsernameAndPassword(user.getUsername(),
+				user.getPassword());
+		final ApplicationUser verifiedUser = findByUsername
+				.orElseThrow(() -> new UsernameNotFoundException("Invalid username / password"));
 		final String token = authTokenProvider.provideAuthToken(verifiedUser);
 		final RefreshToken refreshToken = refreshTokenProvider.provideToken(verifiedUser);
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
@@ -87,16 +87,17 @@ public class UserController {
 		if (findByValue == null) {
 			throw new RefreshFailedException("Invalid token!");
 		}
-		
-		if(LocalDateTime.now().minusDays(SecurityConstants.REFRESH_TOKEN_EXPIRATION_IN_DAYS).isAfter(findByValue.getIssuedAt())) {
+
+		if (LocalDateTime.now().minusDays(SecurityConstants.REFRESH_TOKEN_EXPIRATION_IN_DAYS)
+				.isAfter(findByValue.getIssuedAt())) {
 			throw new RefreshFailedException("Token expired!");
 		}
 
 		final ApplicationUser user = findByValue.getUser();
 
-		final String newAccesstoken = authTokenProvider.provideAuthToken(user);
-		final RefreshToken newRefreshToken = refreshTokenProvider.provideToken(user);
-		
+		final String newAccesstoken = this.authTokenProvider.provideAuthToken(user);
+		final RefreshToken newRefreshToken = this.refreshTokenProvider.provideToken(user);
+
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + newAccesstoken);
 		response.addHeader(REFRESH_HEADER_STRING, newRefreshToken.getValue());
 	}

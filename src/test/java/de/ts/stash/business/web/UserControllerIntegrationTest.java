@@ -1,5 +1,6 @@
 package de.ts.stash.business.web;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -8,7 +9,6 @@ import java.time.LocalDateTime;
 import java.util.Date;
 
 import org.hamcrest.Matchers;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -52,6 +52,7 @@ public class UserControllerIntegrationTest {
 	@Before
 	public void setup() {
 		this.mockMvc = MockMvcBuilders.webAppContextSetup(this.wac).addFilter(springSecurityFilterChain).build();
+		Mockito.when(timeProvider.convert(Mockito.any(LocalDateTime.class))).thenCallRealMethod();
 		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
 	}
 
@@ -105,8 +106,8 @@ public class UserControllerIntegrationTest {
 		final String initialAccessToken = response.getHeader(SecurityConstants.AUTH_HEADER_STRING)
 				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
 
-		Assert.assertThat("Refreshtoken must not be null", initialRefreshToken, Matchers.notNullValue());
-		Assert.assertThat("Accesstoken must not be null", initialAccessToken, Matchers.notNullValue());
+		assertThat(initialRefreshToken).isNotNull();
+		assertThat(initialAccessToken).isNotNull();
 
 		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
 
@@ -124,14 +125,12 @@ public class UserControllerIntegrationTest {
 		final String refreshedAccessToken = refreshResult.getResponse().getHeader(SecurityConstants.AUTH_HEADER_STRING)
 				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
 
-		Assert.assertThat("Should return new refreshtoken", initialRefreshToken, Matchers.not(refreshedRefreshToken));
-		Assert.assertThat("Should return new accesstoken", initialAccessToken, Matchers.not(refreshedAccessToken));
+		assertThat(initialRefreshToken).isNotEqualTo(refreshedRefreshToken);
+		assertThat(initialAccessToken).isNotEqualTo(refreshedAccessToken);
 
 		Date initialExpiresAt = JWT.decode(initialAccessToken).getExpiresAt();
 		Date refreshedExpiresAt = JWT.decode(refreshedAccessToken).getExpiresAt();
 
-		Assert.assertThat("Refreshed accesstoken should expire after initial accesstoken",
-				initialExpiresAt.before(refreshedExpiresAt), Matchers.is(true));
-
+		assertThat(initialExpiresAt).isBefore(refreshedExpiresAt);
 	}
 }

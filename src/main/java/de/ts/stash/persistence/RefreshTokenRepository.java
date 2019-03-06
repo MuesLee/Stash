@@ -8,6 +8,5 @@ import de.ts.stash.auth.user.RefreshToken;
 @RepositoryRestResource(path = "refreshtokens", collectionResourceRel = "refreshtokens", itemResourceRel = "refreshtoken")
 public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long> {
 
-	
 	RefreshToken findByValue(String value);
 }

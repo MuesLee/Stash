@@ -24,24 +24,24 @@ import lombok.Setter;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractAuditableEntity<U, ID> extends AbstractPersistableEntity<ID> {
 
-    /**
+	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@CreatedDate
-    LocalDate createdDate;
+	LocalDate createdDate;
 
-    @LastModifiedDate
-    LocalDate lastModifiedDate;
+	@LastModifiedDate
+	LocalDate lastModifiedDate;
 
-    @CreatedBy
-    @ManyToOne
-    @JoinColumn(name = "created_by")
-    U createdBy;
+	@CreatedBy
+	@ManyToOne
+	@JoinColumn(name = "created_by")
+	U createdBy;
 
-    @LastModifiedBy
-    @ManyToOne
-    @JoinColumn(name = "last_modified_by")
-    U lastModifiedBy;
+	@LastModifiedBy
+	@ManyToOne
+	@JoinColumn(name = "last_modified_by")
+	U lastModifiedBy;
 }

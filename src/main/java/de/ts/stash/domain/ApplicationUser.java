@@ -35,9 +35,6 @@ public class ApplicationUser extends AbstractPersistableEntity<Long> implements 
 		this.credentialsNonExpired = true;
 	}
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = 1L;
 
 	@Column(unique = true, nullable = false)

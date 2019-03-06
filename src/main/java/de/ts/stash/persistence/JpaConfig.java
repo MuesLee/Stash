@@ -17,27 +17,28 @@ import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.domain.Item;
 
 @Configuration
-@EnableJpaRepositories(basePackageClasses= {ItemRepository.class, UserRepository.class, RefreshTokenRepository.class})
-@EntityScan(basePackageClasses= {ApplicationUser.class, Item.class, RefreshToken.class})
+@EnableJpaRepositories(basePackageClasses = { ItemRepository.class, UserRepository.class,
+		RefreshTokenRepository.class })
+@EntityScan(basePackageClasses = { ApplicationUser.class, Item.class, RefreshToken.class })
 @PropertySource("classpath:/persistence.properties")
 @EnableTransactionManagement
 public class JpaConfig {
- 
-    @Autowired
-    private Environment env;
-     
-    @Bean
-    public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-        dataSource.setDriverClassName(env.getProperty("jdbc.driverClassName"));
-        dataSource.setUrl(env.getProperty("jdbc.url"));
-        dataSource.setUsername(env.getProperty("jdbc.username"));
-        dataSource.setPassword(env.getProperty("jdbc.password"));
- 
-        return dataSource;
-    }
-     
-    // configure transactionManager
- 
-    // configure additional Hibernate Properties
+
+	@Autowired
+	private Environment env;
+
+	@Bean
+	public DataSource dataSource() {
+		final DriverManagerDataSource dataSource = new DriverManagerDataSource();
+		dataSource.setDriverClassName(this.env.getProperty("jdbc.driverClassName"));
+		dataSource.setUrl(this.env.getProperty("jdbc.url"));
+		dataSource.setUsername(this.env.getProperty("jdbc.username"));
+		dataSource.setPassword(this.env.getProperty("jdbc.password"));
+
+		return dataSource;
+	}
+
+	// configure transactionManager
+
+	// configure additional Hibernate Properties
 }

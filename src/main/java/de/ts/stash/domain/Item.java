@@ -31,14 +31,31 @@ public class Item extends AbstractAuditableEntity<ApplicationUser, Long> {
 
 	@Column(nullable= false)
 	private String name;
-	
-	@Column(nullable= false, precision=8, scale=2)
-	@Digits(integer=9, fraction=2)                    
+
+	@Column(nullable = false, precision = 8, scale = 2)
+	@Digits(integer = 9, fraction = 2)
 	private BigDecimal amount;
-	
-	@Column(nullable= false)
+
+	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Unit unit;
-	
-	
+
+	public void update(Item item) {
+		this.amount = item.amount;
+		this.name = item.name;
+	}
+
+	public boolean isValid() {
+		if (getId() == null)
+			return false;
+		if (this.amount == null)
+			return false;
+		if (this.unit == null)
+			return false;
+		if (this.name == null || this.name.equals(""))
+			return false;
+
+		return true;
+	}
+
 }

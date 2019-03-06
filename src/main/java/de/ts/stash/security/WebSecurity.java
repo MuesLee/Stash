@@ -24,26 +24,13 @@ import de.ts.stash.security.api.AuthTokenReader;
 
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-	private UserDetailsServiceImpl userDetailsService;
-	private BCryptPasswordEncoder bCryptPasswordEncoder;
+	private final UserDetailsServiceImpl userDetailsService;
+	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	public WebSecurity(UserDetailsServiceImpl userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
+	public WebSecurity(final UserDetailsServiceImpl userDetailsService,
+			final BCryptPasswordEncoder bCryptPasswordEncoder) {
 		this.userDetailsService = userDetailsService;
 		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
-	}
-
-	@Override
-	protected void configure(HttpSecurity http) throws Exception {
-		http.cors().and().csrf().disable().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-				.and().authorizeRequests().antMatchers(HttpMethod.POST, SIGN_UP_URL).permitAll().and()
-				.authorizeRequests().antMatchers(HttpMethod.POST, LOGIN_URL).permitAll().and()
-				.authorizeRequests().antMatchers(HttpMethod.POST, SecurityConstants.REFRESH_URL).permitAll().anyRequest().authenticated()
-				.and().addFilter(new JwtAuthorizationFilter(authenticationManager()));
-	}
-
-	@Override
-	public void configure(AuthenticationManagerBuilder auth) throws Exception {
-		auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
 	}
 
 	@Bean
@@ -56,10 +43,42 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		return new JwtAuthTokenReader();
 	}
 
+	@Override
+	public void configure(final AuthenticationManagerBuilder auth) throws Exception {
+		auth.userDetailsService(this.userDetailsService).passwordEncoder(this.bCryptPasswordEncoder);
+	}
+
+	@Override
+	protected void configure(final HttpSecurity http) throws Exception {
+		http
+				.cors()
+				.and()
+				.csrf()
+				.disable()
+				.sessionManagement()
+				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, SIGN_UP_URL)
+				.permitAll()
+				.and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, LOGIN_URL)
+				.permitAll()
+				.and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, SecurityConstants.REFRESH_URL)
+				.permitAll()
+				.anyRequest()
+				.authenticated()
+				.and()
+				.addFilter(new JwtAuthorizationFilter(authenticationManager()));
+	}
+
 	@Bean
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
-		configuration.setAllowedOrigins(Collections.singletonList(("*")));
+		configuration.setAllowedOrigins(Collections.singletonList("*"));
 		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
 		// setAllowCredentials(true) is important, otherwise:
 		// The value of the 'Access-Control-Allow-Origin' header in the response must
@@ -67,8 +86,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		configuration.setAllowCredentials(true);
 		// setAllowedHeaders is important! Without it, OPTIONS preflight request
 		// will fail with 403 Invalid CORS request
-		configuration.setAllowedHeaders(Arrays.asList(SecurityConstants.AUTH_HEADER_STRING,
-				SecurityConstants.REFRESH_HEADER_STRING, "Cache-Control", "Content-Type"));
+		configuration
+				.setAllowedHeaders(Arrays
+						.asList(SecurityConstants.AUTH_HEADER_STRING, SecurityConstants.REFRESH_HEADER_STRING,
+								"Cache-Control", "Content-Type"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;
