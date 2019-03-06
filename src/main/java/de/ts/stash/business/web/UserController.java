@@ -10,12 +10,14 @@ import java.util.List;
 import java.util.Optional;
 
 import javax.security.auth.RefreshFailedException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -60,10 +62,8 @@ public class UserController {
 		final ApplicationUser newlyCreatedUser = userService
 				.save(new ApplicationUser(user.getUsername(), user.getPassword(), roles));
 		final String token = authTokenProvider.provideAuthToken(newlyCreatedUser);
-		final RefreshToken refreshToken = refreshTokenProvider.provideToken(newlyCreatedUser);
-
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
-		response.addHeader(SecurityConstants.REFRESH_HEADER_STRING, refreshToken.getValue());
+		addRefreshCookie(response, newlyCreatedUser);
 	}
 
 	@PostMapping("/login")
@@ -75,16 +75,15 @@ public class UserController {
 		final ApplicationUser verifiedUser = findByUsername
 				.orElseThrow(() -> new UsernameNotFoundException("Invalid username / password"));
 		final String token = authTokenProvider.provideAuthToken(verifiedUser);
-		final RefreshToken refreshToken = refreshTokenProvider.provideToken(verifiedUser);
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
-		response.addHeader(SecurityConstants.REFRESH_HEADER_STRING, refreshToken.getValue());
+		addRefreshCookie(response, verifiedUser);
 	}
 
 	@PostMapping("/refresh")
 	@ResponseStatus(HttpStatus.OK)
-	public void refresh(@RequestBody final RefreshToken refreshToken, final HttpServletResponse response)
+	public void refresh(@CookieValue(name=REFRESH_HEADER_STRING, required=true) final String refreshTokenValue , final HttpServletResponse response)
 			throws JsonProcessingException, RefreshFailedException {
-		final RefreshToken findByValue = refreshTokenRepository.findByValue(refreshToken.getValue());
+		final RefreshToken findByValue = refreshTokenRepository.findByValue(refreshTokenValue);
 
 		if (findByValue == null) {
 			throw new RefreshFailedException("Invalid token!");
@@ -98,9 +97,19 @@ public class UserController {
 		final ApplicationUser user = findByValue.getUser();
 
 		final String newAccesstoken = this.authTokenProvider.provideAuthToken(user);
-		final RefreshToken newRefreshToken = this.refreshTokenProvider.provideToken(user);
 
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + newAccesstoken);
-		response.addHeader(REFRESH_HEADER_STRING, newRefreshToken.getValue());
+
+		addRefreshCookie(response, user);
+	}
+
+	private void addRefreshCookie(final HttpServletResponse response, final ApplicationUser user) {
+		final RefreshToken refreshToken = refreshTokenProvider.provideToken(user);
+		final Cookie cookie = new Cookie(REFRESH_HEADER_STRING, refreshToken.getValue());
+		cookie.setSecure(true);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(SecurityConstants.REFRESH_TOKEN_EXPIRATION_IN_SECONDS);
+		cookie.setPath("/users/refresh");
+		response.addCookie(cookie);
 	}
 }
