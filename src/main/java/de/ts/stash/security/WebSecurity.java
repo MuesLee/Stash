@@ -88,7 +88,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 		// will fail with 403 Invalid CORS request
 		configuration
 				.setAllowedHeaders(Arrays
-						.asList(SecurityConstants.AUTH_HEADER_STRING, SecurityConstants.REFRESH_HEADER_STRING,
+						.asList(SecurityConstants.AUTH_HEADER_STRING, SecurityConstants.REFRESH_COOKIE_NAME,
 								"Cache-Control", "Content-Type"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);

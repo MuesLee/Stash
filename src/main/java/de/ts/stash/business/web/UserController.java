@@ -2,7 +2,7 @@ package de.ts.stash.business.web;
 
 import static de.ts.stash.security.SecurityConstants.ACCESS_TOKEN_PREFIX;
 import static de.ts.stash.security.SecurityConstants.AUTH_HEADER_STRING;
-import static de.ts.stash.security.SecurityConstants.REFRESH_HEADER_STRING;
+import static de.ts.stash.security.SecurityConstants.REFRESH_COOKIE_NAME;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
@@ -78,10 +78,16 @@ public class UserController {
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
 		addRefreshCookie(response, verifiedUser);
 	}
+	@PostMapping("/logout")
+	@ResponseStatus(HttpStatus.OK)
+	public void logout(final HttpServletResponse response)
+			throws JsonProcessingException {
+		deleteRefreshCookie(response);
+	}
 
 	@PostMapping("/refresh")
 	@ResponseStatus(HttpStatus.OK)
-	public void refresh(@CookieValue(name=REFRESH_HEADER_STRING, required=true) final String refreshTokenValue , final HttpServletResponse response)
+	public void refresh(@CookieValue(name=REFRESH_COOKIE_NAME, required=true) final String refreshTokenValue , final HttpServletResponse response)
 			throws JsonProcessingException, RefreshFailedException {
 		final RefreshToken findByValue = refreshTokenRepository.findByValue(refreshTokenValue);
 
@@ -105,10 +111,18 @@ public class UserController {
 
 	private void addRefreshCookie(final HttpServletResponse response, final ApplicationUser user) {
 		final RefreshToken refreshToken = refreshTokenProvider.provideToken(user);
-		final Cookie cookie = new Cookie(REFRESH_HEADER_STRING, refreshToken.getValue());
+		final Cookie cookie = new Cookie(REFRESH_COOKIE_NAME, refreshToken.getValue());
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
 		cookie.setMaxAge(SecurityConstants.REFRESH_TOKEN_EXPIRATION_IN_SECONDS);
+		cookie.setPath("/users/refresh");
+		response.addCookie(cookie);
+	}
+	private void deleteRefreshCookie(final HttpServletResponse response) {
+		final Cookie cookie = new Cookie(REFRESH_COOKIE_NAME, null);
+		cookie.setSecure(true);
+		cookie.setHttpOnly(true);
+		cookie.setMaxAge(0);
 		cookie.setPath("/users/refresh");
 		response.addCookie(cookie);
 	}

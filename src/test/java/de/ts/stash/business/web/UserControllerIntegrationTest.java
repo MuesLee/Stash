@@ -66,7 +66,7 @@ public class UserControllerIntegrationTest {
 				.andExpect(status().isCreated())
 				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
 						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
-				.andExpect(cookie().value(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()));
+				.andExpect(cookie().value(SecurityConstants.REFRESH_COOKIE_NAME, Matchers.notNullValue()));
 	}
 
 	@Test
@@ -89,6 +89,19 @@ public class UserControllerIntegrationTest {
 				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
 						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)));
 	}
+	
+	@Test
+	public void newlyRegisteredUserCanLogout() throws Exception {
+		final byte[] registerUserData = new RegisterUserData("Andy", "x").asJson();
+		MvcResult signUpResult = mockMvc.perform(post("/users/sign-up").contentType(MediaType.APPLICATION_JSON).content(registerUserData))
+				.andExpect(status().isCreated()).andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
+						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX))).andReturn();
+
+		String accessToken = signUpResult.getResponse().getHeader(SecurityConstants.AUTH_HEADER_STRING);
+		mockMvc.perform(post("/users/logout").contentType(MediaType.APPLICATION_JSON).header(SecurityConstants.AUTH_HEADER_STRING, accessToken))
+				.andExpect(status().is(HttpStatus.OK.value()))
+				.andExpect(cookie().maxAge(SecurityConstants.REFRESH_COOKIE_NAME, 0));
+	}
 
 	@Test
 	public void userCanRefreshAcessTokenWithRefreshToken() throws Exception {
@@ -101,11 +114,11 @@ public class UserControllerIntegrationTest {
 				.andExpect(status().isCreated())
 				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
 						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
-				.andExpect(cookie().value(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()));
+				.andExpect(cookie().value(SecurityConstants.REFRESH_COOKIE_NAME, Matchers.notNullValue()));
 
 		MockHttpServletResponse response = loginResult.andReturn().getResponse();
 
-		final String initialRefreshToken = response.getCookie(SecurityConstants.REFRESH_HEADER_STRING).getValue();
+		final String initialRefreshToken = response.getCookie(SecurityConstants.REFRESH_COOKIE_NAME).getValue();
 		final String initialAccessToken = response.getHeader(SecurityConstants.AUTH_HEADER_STRING)
 				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
 
@@ -114,7 +127,7 @@ public class UserControllerIntegrationTest {
 
 		Mockito.when(timeProvider.currentDateTime()).thenReturn(LocalDateTime.now(TimeProvider.DEFAULT_ZONE));
 
-		Cookie cookie = new Cookie(SecurityConstants.REFRESH_HEADER_STRING, initialRefreshToken);
+		Cookie cookie = new Cookie(SecurityConstants.REFRESH_COOKIE_NAME, initialRefreshToken);
 		cookie.setSecure(true);
 		cookie.setHttpOnly(true);
 		MvcResult refreshResult = mockMvc
@@ -123,11 +136,11 @@ public class UserControllerIntegrationTest {
 				.andExpect(status().is(HttpStatus.OK.value()))
 				.andExpect(header().string(SecurityConstants.AUTH_HEADER_STRING,
 						Matchers.startsWith(SecurityConstants.ACCESS_TOKEN_PREFIX)))
-				.andExpect(cookie().value(SecurityConstants.REFRESH_HEADER_STRING, Matchers.notNullValue()))
+				.andExpect(cookie().value(SecurityConstants.REFRESH_COOKIE_NAME, Matchers.notNullValue()))
 				.andReturn();
 
 		final String refreshedRefreshToken = refreshResult.getResponse()
-				.getHeader(SecurityConstants.REFRESH_HEADER_STRING);
+				.getHeader(SecurityConstants.REFRESH_COOKIE_NAME);
 		final String refreshedAccessToken = refreshResult.getResponse().getHeader(SecurityConstants.AUTH_HEADER_STRING)
 				.substring(SecurityConstants.ACCESS_TOKEN_PREFIX.length());
 
