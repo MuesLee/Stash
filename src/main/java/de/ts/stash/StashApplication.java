@@ -10,7 +10,7 @@ import de.ts.stash.util.TimeProvider;
 @SpringBootApplication
 public class StashApplication {
 
-	public static void main(String[] args) {
+	public static void main(final String[] args) {
 		SpringApplication.run(StashApplication.class, args);
 	}
 
@@ -18,11 +18,9 @@ public class StashApplication {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	
+
 	@Bean
-	public TimeProvider timeProvider()
-	{
+	public TimeProvider timeProvider() {
 		return new TimeProvider();
 	}
-
 }

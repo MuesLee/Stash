@@ -7,6 +7,7 @@ import static de.ts.stash.security.SecurityConstants.REFRESH_HEADER_STRING;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import javax.security.auth.RefreshFailedException;
 import javax.servlet.http.HttpServletResponse;
@@ -27,10 +28,10 @@ import de.ts.stash.auth.user.RefreshToken;
 import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.domain.Role;
 import de.ts.stash.persistence.RefreshTokenRepository;
-import de.ts.stash.persistence.UserRepository;
 import de.ts.stash.security.SecurityConstants;
 import de.ts.stash.security.api.AuthTokenProvider;
 import de.ts.stash.security.api.RefreshTokenProvider;
+import de.ts.stash.service.UserService;
 
 @RestController
 @RequestMapping("/users")
@@ -42,25 +43,22 @@ public class UserController {
 	@Autowired
 	RefreshTokenProvider refreshTokenProvider;
 
-	private final UserRepository userRepository;
+	private final UserService userService;
 	private final RefreshTokenRepository refreshTokenRepository;
-	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-	public UserController(final UserRepository applicationUserRepository,
+	public UserController(final UserService applicationUserRepository,
 			final RefreshTokenRepository refreshTokenRepository, final BCryptPasswordEncoder bCryptPasswordEncoder) {
-		this.userRepository = applicationUserRepository;
+		this.userService = applicationUserRepository;
 		this.refreshTokenRepository = refreshTokenRepository;
-		this.bCryptPasswordEncoder = bCryptPasswordEncoder;
 	}
 
 	@PostMapping("/sign-up")
 	@ResponseStatus(HttpStatus.CREATED)
 	public void signUp(@RequestBody final RegisterUserData user, final HttpServletResponse response)
 			throws JsonProcessingException {
-		final String encodedPassword = bCryptPasswordEncoder.encode(user.getPassword());
 		final List<Role> roles = Arrays.asList(Role.USER);
-		final ApplicationUser newlyCreatedUser = userRepository
-				.save(new ApplicationUser(user.getUsername(), encodedPassword, roles));
+		final ApplicationUser newlyCreatedUser = userService
+				.save(new ApplicationUser(user.getUsername(), user.getPassword(), roles));
 		final String token = authTokenProvider.provideAuthToken(newlyCreatedUser);
 		final RefreshToken refreshToken = refreshTokenProvider.provideToken(newlyCreatedUser);
 
@@ -72,15 +70,10 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	public void login(@RequestBody final RegisterUserData user, final HttpServletResponse response)
 			throws JsonProcessingException {
-		final ApplicationUser findByUsername = userRepository.findByUsername(user.getUsername());
-		if (findByUsername == null
-				|| !bCryptPasswordEncoder.matches(user.getPassword(), findByUsername.getPassword())) {
-			throw new UsernameNotFoundException(
-					"User " + user.getUsername() + " could not be found or a bad password has been provided");
-		}
-
-		final String token = authTokenProvider.provideAuthToken(findByUsername);
-		final RefreshToken refreshToken = refreshTokenProvider.provideToken(findByUsername);
+		final Optional<ApplicationUser> findByUsername = userService.findByUsernameAndPassword(user.getUsername(), user.getPassword());
+		final ApplicationUser verifiedUser = findByUsername.orElseThrow( ()-> new UsernameNotFoundException("Invalid username / password"));
+		final String token = authTokenProvider.provideAuthToken(verifiedUser);
+		final RefreshToken refreshToken = refreshTokenProvider.provideToken(verifiedUser);
 		response.addHeader(AUTH_HEADER_STRING, ACCESS_TOKEN_PREFIX + token);
 		response.addHeader(SecurityConstants.REFRESH_HEADER_STRING, refreshToken.getValue());
 	}
@@ -89,7 +82,7 @@ public class UserController {
 	@ResponseStatus(HttpStatus.OK)
 	public void refresh(@RequestBody final RefreshToken refreshToken, final HttpServletResponse response)
 			throws JsonProcessingException, RefreshFailedException {
-		RefreshToken findByValue = refreshTokenRepository.findByValue(refreshToken.getValue());
+		final RefreshToken findByValue = refreshTokenRepository.findByValue(refreshToken.getValue());
 
 		if (findByValue == null) {
 			throw new RefreshFailedException("Invalid token!");
@@ -99,7 +92,7 @@ public class UserController {
 			throw new RefreshFailedException("Token expired!");
 		}
 
-		ApplicationUser user = findByValue.getUser();
+		final ApplicationUser user = findByValue.getUser();
 
 		final String newAccesstoken = authTokenProvider.provideAuthToken(user);
 		final RefreshToken newRefreshToken = refreshTokenProvider.provideToken(user);

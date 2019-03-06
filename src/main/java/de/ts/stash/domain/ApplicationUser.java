@@ -6,9 +6,6 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -26,10 +23,9 @@ import lombok.Setter;
 @Setter
 @Entity
 @Builder
-public class ApplicationUser implements UserDetails {
-	
+public class ApplicationUser extends AbstractPersistableEntity<Long> implements UserDetails {
+
 	public ApplicationUser(String username, String password, List<Role> authorities) {
-		this.id = 0l;
 		this.username = username;
 		this.password = password;
 		this.authorities = authorities;
@@ -38,38 +34,32 @@ public class ApplicationUser implements UserDetails {
 		this.enabled = true;
 		this.credentialsNonExpired = true;
 	}
-	
-	
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	@Column(unique = true, nullable=false)
+	@Column(unique = true, nullable = false)
 	private String username;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private String password;
-	
+
 	@ElementCollection
 	@Fetch(FetchMode.JOIN)
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private Collection<Role> authorities;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean accountNonExpired;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean accountNonLocked;
-	
-	@Column(nullable=false)
+
+	@Column(nullable = false)
 	private boolean credentialsNonExpired;
 
-	@Column(nullable=false)
+	@Column(nullable = false)
 	private boolean enabled;
 }
