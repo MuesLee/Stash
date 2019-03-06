@@ -23,4 +23,5 @@ public class StashApplication {
 	public TimeProvider timeProvider() {
 		return new TimeProvider();
 	}
+
 }
