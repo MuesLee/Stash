@@ -28,14 +28,14 @@ public class UserService {
 			user.setPassword(encodedPassword);
 		}
 
-		return userRepository.save(user);
+		return userRepository.saveAndFlush(user);
 	}
 
 	private boolean userExists(final ApplicationUser user) {
 		return user != null && user.getId() != null && userRepository.existsById(user.getId());
 	}
 
-	public Optional<ApplicationUser> findByUsernameAndPassword (final String username, final String password) {
+	public Optional<ApplicationUser> findByUsernameAndPassword(final String username, final String password) {
 		final ApplicationUser foundUser = userRepository.findByUsername(username);
 		if (foundUser == null) {
 			return Optional.empty();
