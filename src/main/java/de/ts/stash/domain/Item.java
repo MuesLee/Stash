@@ -7,7 +7,10 @@ import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -45,6 +48,8 @@ public class Item extends AbstractAuditableEntity<ApplicationUser, Long> {
 		this.name = item.name;
 	}
 
+	@Transient
+	@JsonIgnore
 	public boolean isValid() {
 		if (getId() == null)
 			return false;

@@ -52,6 +52,8 @@ public class UserController {
 		this.refreshTokenRepository = refreshTokenRepository;
 	}
 
+	@PostMapping("/sign-up")
+	@ResponseStatus(HttpStatus.CREATED)
 	public void signUp(@RequestBody final RegisterUserData user, final HttpServletResponse response)
 			throws JsonProcessingException {
 		final List<Role> roles = Arrays.asList(Role.USER);
