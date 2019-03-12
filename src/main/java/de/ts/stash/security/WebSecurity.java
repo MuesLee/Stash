@@ -1,6 +1,7 @@
 package de.ts.stash.security;
 
 import static de.ts.stash.security.SecurityConstants.LOGIN_URL;
+import static de.ts.stash.security.SecurityConstants.LOGOUT_URL;
 import static de.ts.stash.security.SecurityConstants.SIGN_UP_URL;
 
 import java.util.Arrays;
@@ -51,12 +52,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	@Override
 	protected void configure(final HttpSecurity http) throws Exception {
 		http
-				.cors()
+				.cors().configurationSource(corsConfigurationSource())
 				.and()
 				.csrf()
 				.disable()
 				.sessionManagement()
 				.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+				.and()
+				.authorizeRequests()
+				.antMatchers(HttpMethod.POST, LOGOUT_URL)
+				.permitAll()
 				.and()
 				.authorizeRequests()
 				.antMatchers(HttpMethod.POST, SIGN_UP_URL)
@@ -79,17 +84,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 	public CorsConfigurationSource corsConfigurationSource() {
 		final CorsConfiguration configuration = new CorsConfiguration();
 		configuration.setAllowedOrigins(Collections.singletonList("*"));
-		configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
-		// setAllowCredentials(true) is important, otherwise:
-		// The value of the 'Access-Control-Allow-Origin' header in the response must
-		// not be the wildcard '*' when the request's credentials mode is 'include'.
+		configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE"));
 		configuration.setAllowCredentials(true);
-		// setAllowedHeaders is important! Without it, OPTIONS preflight request
-		// will fail with 403 Invalid CORS request
+		configuration.addExposedHeader(SecurityConstants.AUTH_HEADER_STRING);
 		configuration
 				.setAllowedHeaders(Arrays
-						.asList(SecurityConstants.AUTH_HEADER_STRING, SecurityConstants.REFRESH_COOKIE_NAME,
-								"Cache-Control", "Content-Type"));
+						.asList(SecurityConstants.AUTH_HEADER_STRING,
+								"Content-Type"));
 		final UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
 		source.registerCorsConfiguration("/**", configuration);
 		return source;

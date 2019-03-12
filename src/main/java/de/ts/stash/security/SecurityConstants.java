@@ -10,5 +10,6 @@ public class SecurityConstants {
 	public static final String REFRESH_COOKIE_NAME = "Refreshtoken";
 	public static final String SIGN_UP_URL = "/users/sign-up";
 	public static final String LOGIN_URL = "/users/login";
+	public static final String LOGOUT_URL = "/users/logout";
 	public static final String REFRESH_URL = "/users/refresh";
 }
