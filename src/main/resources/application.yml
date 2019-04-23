@@ -14,7 +14,6 @@ spring:
       ACCEPT_SINGLE_VALUE_AS_ARRAY: true
     default-property-inclusion: non_empty 
 
-
   datasource:
     cachePrepStmts: true
     prepStmtCacheSize: 250

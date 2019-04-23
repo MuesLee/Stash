@@ -29,7 +29,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.ts.stash.business.web.RegisterUserData;
-import de.ts.stash.domain.Item;
+import de.ts.stash.domain.ItemDefinition;
 import de.ts.stash.security.SecurityConstants;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -66,7 +66,7 @@ public class StashApplicationIntegrationTest {
 				.andReturn().getResponse();
 		String contentAsString = response.getContentAsString();
 
-		List<Item> actualItems = new ObjectMapper().readValue(contentAsString, new TypeReference<List<Item>>() {
+		List<ItemDefinition> actualItems = new ObjectMapper().readValue(contentAsString, new TypeReference<List<ItemDefinition>>() {
 		});
 
 		Assert.assertThat("Items has size 2", actualItems, Matchers.hasSize(2));

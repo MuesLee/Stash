@@ -6,6 +6,7 @@ import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
 import javax.validation.constraints.Digits;
@@ -27,13 +28,14 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class Item extends AbstractAuditableEntity<ApplicationUser, Long> {
 
+
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	@Column(nullable= false)
-	private String name;
+	@ManyToOne(optional=false)
+	private ItemDefinition definition;
 
 	@Column(nullable = false, precision = 8, scale = 2)
 	@Digits(integer = 9, fraction = 2)
@@ -43,24 +45,14 @@ public class Item extends AbstractAuditableEntity<ApplicationUser, Long> {
 	@Enumerated(EnumType.STRING)
 	private Unit unit;
 
-	public void update(Item item) {
-		this.amount = item.amount;
-		this.name = item.name;
-	}
-
 	@Transient
 	@JsonIgnore
 	public boolean isValid() {
-		if (getId() == null)
-			return false;
-		if (this.amount == null)
-			return false;
-		if (this.unit == null)
-			return false;
-		if (this.name == null || this.name.equals(""))
-			return false;
-
 		return true;
 	}
 
+	public void update(Item form) {
+		
+	}
+	
 }

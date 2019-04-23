@@ -27,7 +27,7 @@ import de.ts.stash.persistence.ItemRepository;
 @RequestMapping("/v1/items")
 public class ItemController {
 	private final ItemRepository items;
-
+	
 	public ItemController(final ItemRepository Items) {
 		this.items = Items;
 	}
@@ -49,17 +49,14 @@ public class ItemController {
 		return ok(this.items.findById(id).orElseThrow(() -> new ItemNotFoundException()));
 	}
 
-	@PostMapping("")
+	@PutMapping("")
 	public ResponseEntity<Long> save(@RequestBody final Item form, final HttpServletRequest request) {
-		final Item saved = this.items.save(Item.builder().name(form.getName()).build());
-		return created(ServletUriComponentsBuilder
-				.fromContextPath(request)
-				.path("/v1/items/{id}")
-				.buildAndExpand(saved.getId())
-				.toUri()).build();
+		final Item saved = this.items.save(form);
+		return created(ServletUriComponentsBuilder.fromContextPath(request).path("/v1/items/{id}")
+				.buildAndExpand(saved.getId()).toUri()).build();
 	}
 
-	@PutMapping("/{id}")
+	@PostMapping("/{id}")
 	@ResponseBody
 	public void update(@PathVariable("id") final Long id, @RequestBody final Item form) {
 		if (!form.isValid()) {

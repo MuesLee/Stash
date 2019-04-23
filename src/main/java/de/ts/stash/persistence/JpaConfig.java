@@ -15,11 +15,12 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import de.ts.stash.auth.user.RefreshToken;
 import de.ts.stash.domain.ApplicationUser;
 import de.ts.stash.domain.Item;
+import de.ts.stash.domain.ItemDefinition;
 
 @Configuration
 @EnableJpaRepositories(basePackageClasses = { ItemRepository.class, UserRepository.class,
-		RefreshTokenRepository.class })
-@EntityScan(basePackageClasses = { ApplicationUser.class, Item.class, RefreshToken.class })
+		RefreshTokenRepository.class, ItemDefinitionRepository.class })
+@EntityScan(basePackageClasses = { ApplicationUser.class, Item.class, ItemDefinition.class, RefreshToken.class })
 @PropertySource("classpath:/persistence.properties")
 @EnableTransactionManagement
 public class JpaConfig {
