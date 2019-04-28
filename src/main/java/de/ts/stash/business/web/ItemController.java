@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import de.ts.stash.domain.Item;
 import de.ts.stash.exception.ItemNotFoundException;
+import de.ts.stash.exception.MismatchingIdException;
 import de.ts.stash.persistence.ItemRepository;
 
 @RestController
@@ -63,7 +64,12 @@ public class ItemController {
 			throw new IllegalArgumentException("Invalid item");
 		}
 		final Item existed = this.items.findById(id).orElseThrow(() -> new ItemNotFoundException());
-		existed.update(form);
-		this.items.save(existed);
+		if(!existed.getId().equals(id) || !id.equals(form.getId()))
+		{
+			throw new MismatchingIdException();
+		}
+		this.items.delete(existed);
+		this.items.save(form);
+		this.items.flush();
 	}
 }
