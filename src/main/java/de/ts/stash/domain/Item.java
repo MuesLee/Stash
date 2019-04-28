@@ -1,6 +1,7 @@
 package de.ts.stash.domain;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -44,15 +45,13 @@ public class Item extends AbstractAuditableEntity<ApplicationUser, Long> {
 	@Column(nullable = false)
 	@Enumerated(EnumType.STRING)
 	private Unit unit;
-
+	
+	@Column(nullable = false)
+	private LocalDate storedAt;
+	
 	@Transient
 	@JsonIgnore
 	public boolean isValid() {
 		return true;
 	}
-
-	public void update(Item form) {
-		
-	}
-	
 }
